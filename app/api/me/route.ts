@@ -1,0 +1,1 @@
+import{NextResponse}from'next/server';import{userId}from'../../../lib/session';import{localDb}from'../../../lib/local-db';export async function GET(){const id=await userId();if(!id)return NextResponse.json({user:null},{status:401});return NextResponse.json({user:localDb.prepare('SELECT id,email,name,audience,onboarding_complete FROM users WHERE id=?').get(id)})}

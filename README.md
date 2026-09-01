@@ -1,31 +1,34 @@
-# RoleFit
+# Rolefit
 
-RoleFit is a browser-local first-cut job-application workspace. It helps you review a seeded list of roles, compare fit signals, track application status, and keep notes without sending your data to a server.
+A full-stack job application workspace built with Next.js App Router, TypeScript, Tailwind, Radix/shadcn-style components, SQLite, migrations and API routes.
 
 ## Run locally
 
-No build step is required. Serve the folder with any static web server, for example:
-
 ```bash
-python3 -m http.server 8000
+npm install
+npm run dev
 ```
 
-Then open `http://localhost:8000`.
+Open `http://localhost:3000`. On first API access, `data/rolefit.db` is created, migration `migrations/001_init.sql` runs, and all 51 PM roles are seeded. No account or API key is required.
 
-## Data and privacy
+## Real persistence
 
-- The app runs entirely in the browser.
-- Seed roles come from `seed-roles.json`.
-- Notes and workflow state stay in browser local storage.
-- There is no account, backend, analytics service, or paid dependency in this first cut.
+- `GET /api/roles` loads the pipeline from SQLite
+- `PATCH /api/roles/:id` persists status/notes and writes pipeline history
+- `POST /api/analyze` extracts JD requirements and persists each analysis
+- `GET|POST /api/resumes` persists resume versions and fact-guard metadata
+- `GET|PUT /api/settings` configures primary and fallback OpenRouter models
 
-This is a first-cut workspace, not an automated job-application service. Review role details and company sources before applying.
+Without `OPENROUTER_API_KEY`, analysis uses deterministic, input-driven extraction behind the same interface. With a key, it calls OpenRouter using the configured model and fallback.
 
-## Project files
+## Production
 
-- `index.html`: the complete local web app
-- `seed-roles.json`: the initial role dataset
+SQLite is the zero-account local path. For Vercel, use the included schema as the migration source for Supabase Postgres, then replace the local DB adapter with Supabase. Required hosted values: Supabase project URL, anon key, service-role key, database URL and optional OpenRouter key.
 
-## License
+## Product tiers (billing-ready, no billing implemented)
 
-No license has been added yet.
+The free tier is designed to be useful: one active profile, five saved roles, three analyses per month, one tailored export, and full fact-guard review. A later paid tier can raise limits and add multiple active profiles, unlimited tailoring and richer history. No payment code or provider is connected.
+
+## Multi-user model
+
+Local auth uses password hashing plus opaque HTTP-only sessions. Users choose student or professional during signup. Onboarding creates a private source profile; student profiles explicitly accept projects, coursework, internships, volunteering and leadership as evidence without presenting them as jobs. The schema includes user-scoped profile resumes, roles, analyses and resume versions. Hosted deployment will swap the local adapter for Supabase Auth/Postgres with row-level security.
