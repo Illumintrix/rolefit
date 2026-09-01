@@ -1,0 +1,18 @@
+# OS and editor files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.vscode/
+.idea/
+
+# Logs and local environment
+*.log
+.env
+.env.*
+!.env.example
+
+# Local server and test output
+node_modules/
+dist/
+coverage/
